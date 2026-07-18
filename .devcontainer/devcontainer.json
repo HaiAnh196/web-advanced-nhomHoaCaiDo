@@ -1,0 +1,24 @@
+{
+  "name": "NestJS & React Monorepo Workspace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "coenraets.bracket-pair-colorizer-2",
+        "christian-kohler.path-intellisense"
+      ],
+      "settings": {
+        "eslint.workingDirectories": ["./backend", "./frontend"],
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  },
+  "forwardPorts": [3000, 5173],
+  "postCreateCommand": "cd backend && npm install && cd ../frontend && npm install"
+}
