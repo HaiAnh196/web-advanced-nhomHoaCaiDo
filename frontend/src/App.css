@@ -13,7 +13,7 @@ body {
 
 /* Header */
 .header {
-  background-color: #003399; /* Xanh Navy Phenikaa */
+  background-color: #e20031; /* Xanh Navy Phenikaa */
   color: white;
   display: flex;
   justify-content: space-between;
@@ -157,3 +157,99 @@ body {
   text-align: center;
   padding: 1.5rem;
 }
+
+/* CSS cho Navbar mới */
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-bar {
+  display: flex;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  width: 40%;
+  max-width: 500px;
+  border: 1px solid #ccc;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.search-bar button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+}
+
+.search-bar button:hover {
+  color: #003399;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.3s;
+}
+
+.nav-link:hover {
+  opacity: 0.8;
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: #ff3b30;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.btn-login-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: white;
+  color: #003399;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-login-icon:hover {
+  background-color: #f1f1f1;
+  transform: translateY(-1px);
+}
+
