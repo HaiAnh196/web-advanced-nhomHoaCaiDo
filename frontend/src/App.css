@@ -253,3 +253,310 @@ body {
   transform: translateY(-1px);
 }
 
+/* Styling cho Component Sidebar danh mục */
+.sidebar-container {
+  width: 240px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 8px 0;
+  border: 1px solid #eaeaea;
+  flex-shrink: 0;
+}
+
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-item {
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #2d2d2d;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #f8f9fa;
+  color: #e20031;
+}
+
+.sidebar-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-icon {
+  color: #e20031;
+  flex-shrink: 0;
+}
+
+.sidebar-icon-placeholder {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.sidebar-label {
+  white-space: nowrap;
+}
+
+.sidebar-arrow {
+  color: #e20031;
+  opacity: 0.85;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-link:hover .sidebar-arrow {
+  transform: translateX(3px);
+}
+
+/* Layout container cho Trang danh sách sản phẩm kết hợp Sidebar */
+.home-layout {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  align-items: flex-start;
+}
+
+.home-main-content {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* ======================================================
+   PRODUCT CARD BOX STYLES (MATCHING SCREENSHOT DESIGN)
+   ====================================================== */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.product-card-box {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 12px;
+  height: 650px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Badge góc trên bên trái */
+.product-top-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #fff0f2;
+  color: #e20031;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-bottom-right-radius: 12px;
+  z-index: 2;
+  letter-spacing: 0.2px;
+}
+
+/* Khung chứa ảnh sản phẩm */
+.product-image-wrapper {
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.product-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-card-box:hover .product-img {
+  transform: scale(1.04);
+}
+
+/* Sub-banner dưới ảnh */
+.product-sub-banner {
+  background: linear-gradient(90deg, #fff3ea 0%, #ffede0 100%);
+  border-radius: 6px;
+  padding: 6px 10px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.sub-banner-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #d9480f;
+  line-height: 1.3;
+}
+
+/* Tên sản phẩm */
+.product-box-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.35;
+  margin: 0 0 10px 0;
+  min-height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: left;
+}
+
+/* Giá bán hiện tại và giá cũ */
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.price-current {
+  color: #e20031;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.price-old {
+  color: #9ca3af;
+  font-size: 13px;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+/* Đánh giá sao */
+.product-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.star-icon-filled {
+  color: #f59e0b;
+  fill: #f59e0b;
+}
+
+.rating-text {
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* Quyền lợi thành viên (Ưu đãi Edu, Khách hàng thân thiết) */
+.product-member-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.perk-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.perk-label {
+  color: #4b5563;
+}
+
+.perk-value {
+  color: #e20031;
+  font-weight: 700;
+}
+
+/* Khung khuyến mãi quà tặng màu xám */
+.product-promo-box {
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+
+.promo-box-text {
+  font-size: 12px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Dòng khuyến mãi khác */
+.product-extra-promos {
+  color: #e20031;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* Nút Thêm vào giỏ */
+.btn-add-to-cart-box {
+  margin-top: auto;
+  background-color: #e20031;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-add-to-cart-box:hover {
+  background-color: #c00029;
+  transform: translateY(-1px);
+}
+
+
+

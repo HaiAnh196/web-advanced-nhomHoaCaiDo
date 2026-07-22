@@ -2,29 +2,36 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../utils/api";
 
-function Login() {
+function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
+    setLoading(true);
     api
-      .post("/auth/login", { username, password })
+      .post("/auth/register", { username, password })
       .then((response) => {
-        alert("Đăng nhập thành công!");
-        localStorage.setItem("token", response.data.access_token);
-        // Lưu trữ cả tên user nếu cần (hoặc decode JWT, tạm thời reload lại trang để navbar cập nhật)
-        window.location.href = "/";
+        alert("Đăng ký tài khoản thành công! Hãy đăng nhập.");
+        navigate("/login");
       })
-      .catch((error) => {
-        console.error("Lỗi đăng nhập:", error);
-        setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!");
+      .catch((err) => {
+        console.error("Lỗi đăng ký:", err);
+        setError(
+          err.response?.data?.message ||
+            "Đăng ký thất bại. Tên đăng nhập có thể đã tồn tại!"
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -41,7 +48,7 @@ function Login() {
         boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.08)",
         border: "1px solid rgba(255, 255, 255, 0.18)"
       }}>
-        <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#333" }}>Đăng Nhập</h2>
+        <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#333" }}>Tạo Tài Khoản</h2>
         
         {error && (
           <div style={{
@@ -57,9 +64,11 @@ function Login() {
           </div>
         )}
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
           <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", color: "#555" }}>Tên đăng nhập:</label>
+            <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", color: "#555" }}>
+              Tên đăng nhập:
+            </label>
             <input
               type="text"
               value={username}
@@ -76,8 +85,11 @@ function Login() {
               required
             />
           </div>
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", color: "#555" }}>Mật khẩu:</label>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", color: "#555" }}>
+              Mật khẩu:
+            </label>
             <input
               type="password"
               value={password}
@@ -94,6 +106,28 @@ function Login() {
               required
             />
           </div>
+
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", color: "#555" }}>
+              Xác nhận mật khẩu:
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              placeholder="Nhập lại mật khẩu"
+              required
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -109,14 +143,14 @@ function Login() {
               transition: "background 0.2s"
             }}
           >
-            {loading ? "Đang xử lý..." : "Đăng Nhập"}
+            {loading ? "Đang xử lý..." : "Đăng Ký"}
           </button>
         </form>
 
         <div style={{ marginTop: "20px", textAlign: "center", fontSize: "14px", color: "#666" }}>
-          Chưa có tài khoản?{" "}
-          <Link to="/register" style={{ color: "#e53935", fontWeight: "600", textDecoration: "none" }}>
-            Đăng ký ngay
+          Đã có tài khoản?{" "}
+          <Link to="/login" style={{ color: "#e53935", fontWeight: "600", textDecoration: "none" }}>
+            Đăng nhập ngay
           </Link>
         </div>
       </div>
@@ -124,4 +158,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
