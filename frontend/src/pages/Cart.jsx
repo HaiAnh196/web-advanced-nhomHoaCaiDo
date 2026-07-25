@@ -1,102 +1,94 @@
+import { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { Link, useNavigate } from "react-router-dom";
-import { Trash2, ShoppingBag, ArrowLeft, CreditCard } from "lucide-react";
+import { useToast } from "../context/ToastContext";
+import { Link } from "react-router-dom";
+import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag, Check, ArrowRight } from "lucide-react";
+import CheckoutModal from "../components/CheckoutModal";
 
 function Cart() {
-  const { cartItems, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
-  const navigate = useNavigate();
+  const { cartItems, updateQuantity, removeFromCart, totalPrice } = useCart();
+  const { addToast } = useToast();
 
-  const handleCheckout = () => {
-    alert("Cảm ơn bạn đã đặt hàng! Đơn hàng của bạn đang được xử lý.");
-    clearCart();
-    navigate("/");
+  const [couponCode, setCouponCode] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    if (couponCode.trim().toUpperCase() === "HOACAIDO") {
+      setDiscountPercent(10);
+      setIsCouponApplied(true);
+      addToast("Áp dụng mã HOACAIDO giảm 10% thành công!", "success");
+    } else {
+      addToast("Mã giảm giá không hợp lệ hoặc đã hết hạn!", "error");
+    }
   };
+
+  const discountAmount = Math.round((totalPrice * discountPercent) / 100);
+  const finalTotal = Math.max(0, totalPrice - discountAmount);
 
   if (cartItems.length === 0) {
     return (
-      <div className="cart-empty-container" style={{
-        textAlign: "center",
-        padding: "60px 20px",
-        background: "#fff",
-        borderRadius: "16px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-        maxWidth: "600px",
-        margin: "40px auto"
-      }}>
-        <ShoppingBag size={64} color="#ccc" style={{ marginBottom: "20px" }} />
-        <h2 style={{ color: "#333", marginBottom: "10px" }}>Giỏ hàng trống!</h2>
-        <p style={{ color: "#666", marginBottom: "30px" }}>Hãy chọn những món quà tuyệt vời từ trường Đại học Phenikaa nhé.</p>
-        <Link to="/" style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "#e53935",
-          color: "white",
-          padding: "12px 24px",
-          borderRadius: "8px",
-          textDecoration: "none",
-          fontWeight: "600"
-        }}>
-          Quay lại cửa hàng
+      <div className="cart-empty-container">
+        <div className="empty-cart-icon-wrapper">
+          <ShoppingBag size={64} className="empty-cart-icon" />
+        </div>
+        <h2>Giỏ hàng của bạn đang trống!</h2>
+        <p>Hãy khám phá các sản phẩm tuyệt vời từ cửa hàng HoaCaiDo Phenikaa Uni nhé.</p>
+        <Link to="/" className="btn-shop-now">
+          <ArrowLeft size={18} /> Khám phá cửa hàng ngay
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="cart-page-container" style={{ maxWidth: "1000px", margin: "20px auto", padding: "0 20px" }}>
-      <h2 style={{ color: "#333", marginBottom: "20px" }}>Giỏ hàng của bạn</h2>
+    <div className="cart-page-container">
+      <h2 className="cart-page-title">Giỏ hàng của bạn ({cartItems.reduce((s, i) => s + i.quantity, 0)} sản phẩm)</h2>
 
-      <div className="cart-layout" style={{
-        display: "flex",
-        gap: "30px",
-        flexWrap: "wrap"
-      }}>
-        {/* Danh sách sản phẩm bên trái */}
-        <div className="cart-items-list" style={{ flex: "1 1 600px", background: "#fff", borderRadius: "16px", padding: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+      <div className="cart-layout-grid">
+        {/* Cột Danh sách sản phẩm */}
+        <div className="cart-items-card">
+          <div className="cart-header-row">
+            <span>Sản phẩm</span>
+            <span>Đơn giá</span>
+            <span>Số lượng</span>
+            <span>Thành tiền</span>
+            <span>Thao tác</span>
+          </div>
+
           {cartItems.map((item) => (
-            <div key={item.id} className="cart-item-row" style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-              padding: "15px 0",
-              borderBottom: "1px solid #eee",
-              flexWrap: "wrap"
-            }}>
-              <img src={item.imageUrl} alt={item.name} style={{ width: "80px", height: "80px", borderRadius: "8px", objectFit: "cover" }} />
-              
-              <div style={{ flex: "1 1 200px" }}>
-                <span style={{ fontSize: "12px", color: "#e53935", fontWeight: "600", textTransform: "uppercase" }}>{item.category}</span>
-                <h4 style={{ margin: "5px 0", color: "#333", fontSize: "16px" }}>{item.name}</h4>
-                <p style={{ margin: 0, color: "#666", fontSize: "14px" }}>Đơn giá: {item.price.toLocaleString()} VNĐ</p>
+            <div key={item.id} className="cart-item-row">
+              <div className="cart-product-info">
+                <img src={item.imageUrl} alt={item.name} className="cart-item-img" />
+                <div>
+                  <span className="item-category">{item.category}</span>
+                  <h4 className="item-title">{item.name}</h4>
+                </div>
+              </div>
+
+              <div className="cart-price">
+                {item.price.toLocaleString()} ₫
               </div>
 
               {/* Tăng giảm số lượng */}
-              <div style={{ display: "flex", alignItems: "center", border: "1px solid #ddd", borderRadius: "6px", overflow: "hidden" }}>
-                <button 
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  style={{ padding: "5px 12px", border: "none", background: "#f9f9f9", cursor: "pointer" }}
-                >
-                  -
-                </button>
-                <span style={{ padding: "5px 15px", fontWeight: "600", fontSize: "14px" }}>{item.quantity}</span>
-                <button 
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  style={{ padding: "5px 12px", border: "none", background: "#f9f9f9", cursor: "pointer" }}
-                >
-                  +
-                </button>
+              <div className="qty-picker">
+                <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+                <span>{item.quantity}</span>
+                <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
               </div>
 
-              <div style={{ textAlign: "right", minWidth: "120px" }}>
-                <p style={{ margin: 0, fontWeight: "bold", color: "#333" }}>{(item.price * item.quantity).toLocaleString()} VNĐ</p>
+              <div className="cart-subtotal">
+                {(item.price * item.quantity).toLocaleString()} ₫
               </div>
 
               <button 
-                onClick={() => removeFromCart(item.id)}
-                style={{ background: "none", border: "none", color: "#999", cursor: "pointer", padding: "5px", transition: "color 0.2s" }}
-                onMouseOver={(e) => e.currentTarget.style.color = "#e53935"}
-                onMouseOut={(e) => e.currentTarget.style.color = "#999"}
+                onClick={() => {
+                  removeFromCart(item.id);
+                  addToast(`Đã xóa "${item.name}" khỏi giỏ hàng`, "info");
+                }}
+                className="btn-remove-item"
                 title="Xóa sản phẩm"
               >
                 <Trash2 size={18} />
@@ -104,66 +96,78 @@ function Cart() {
             </div>
           ))}
 
-          <div style={{ marginTop: "20px" }}>
-            <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#666", textDecoration: "none", fontSize: "14px" }}>
-              <ArrowLeft size={16} /> Tiếp tục mua sắm
+          <div className="cart-bottom-actions">
+            <Link to="/" className="btn-continue-shopping">
+              <ArrowLeft size={16} /> Tiếp tục chọn sản phẩm khác
             </Link>
           </div>
         </div>
 
-        {/* Tóm tắt đơn hàng bên phải */}
-        <div className="cart-summary-card" style={{
-          flex: "1 1 300px",
-          background: "#fff",
-          borderRadius: "16px",
-          padding: "25px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          alignSelf: "flex-start",
-          boxSizing: "border-box"
-        }}>
-          <h3 style={{ color: "#333", margin: "0 0 20px 0" }}>Tổng đơn hàng</h3>
-          
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px", color: "#666" }}>
+        {/* Cột Tóm tắt đơn hàng bên phải */}
+        <div className="cart-summary-card">
+          <h3>Tóm tắt đơn hàng</h3>
+
+          {/* Ô Nhập Mã Giảm Giá */}
+          <form className="coupon-form" onSubmit={handleApplyCoupon}>
+            <div className="coupon-input-wrapper">
+              <Tag size={16} className="coupon-icon" />
+              <input
+                type="text"
+                placeholder="Nhập mã 'HOACAIDO'"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={isCouponApplied}
+              />
+              <button type="submit" disabled={isCouponApplied || !couponCode}>
+                {isCouponApplied ? <Check size={16} /> : "Áp dụng"}
+              </button>
+            </div>
+            {isCouponApplied && (
+              <p className="coupon-success-text">✔ Đã giảm 10% cho toàn bộ đơn hàng</p>
+            )}
+          </form>
+
+          <hr className="summary-divider" />
+
+          <div className="summary-row">
             <span>Tạm tính:</span>
-            <span>{totalPrice.toLocaleString()} VNĐ</span>
+            <strong>{totalPrice.toLocaleString()} ₫</strong>
           </div>
-          
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", color: "#666" }}>
+
+          {discountAmount > 0 && (
+            <div className="summary-row discount">
+              <span>Giảm giá mã quà tặng:</span>
+              <strong className="discount-tag">-{discountAmount.toLocaleString()} ₫</strong>
+            </div>
+          )}
+
+          <div className="summary-row">
             <span>Phí vận chuyển:</span>
-            <span style={{ color: "#2e7d32", fontWeight: "500" }}>Miễn phí</span>
+            <span className="free-ship-badge">Miễn phí 100%</span>
           </div>
 
-          <div style={{ height: "1px", background: "#eee", marginBottom: "20px" }} />
+          <hr className="summary-divider" />
 
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "25px", fontSize: "18px", fontWeight: "bold", color: "#333" }}>
-            <span>Tổng cộng:</span>
-            <span style={{ color: "#e53935" }}>{totalPrice.toLocaleString()} VNĐ</span>
+          <div className="summary-row total-row">
+            <span>Tổng cộng thanh toán:</span>
+            <strong className="total-price-text">{finalTotal.toLocaleString()} ₫</strong>
           </div>
 
           <button 
-            onClick={handleCheckout}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              width: "100%",
-              padding: "14px",
-              background: "#2e7d32",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "background 0.2s"
-            }}
+            onClick={() => setIsCheckoutOpen(true)}
+            className="btn-proceed-checkout"
           >
-            <CreditCard size={18} />
-            Tiến hành thanh toán
+            <CreditCard size={20} /> Tiến hành thanh toán ngay <ArrowRight size={18} />
           </button>
         </div>
       </div>
+
+      {/* Modal Thanh Toán Checkout */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        discountAmount={discountAmount}
+      />
     </div>
   );
 }

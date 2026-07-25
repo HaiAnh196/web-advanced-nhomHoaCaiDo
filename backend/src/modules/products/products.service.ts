@@ -105,13 +105,17 @@ export class ProductsService {
     let result = this.products;
 
     if (search) {
+      const term = search.toLowerCase();
       result = result.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase()),
+        p.name.toLowerCase().includes(term) ||
+        p.category.toLowerCase().includes(term) ||
+        (p.description && p.description.toLowerCase().includes(term)) ||
+        (p.subBanner && p.subBanner.toLowerCase().includes(term))
       );
     }
 
     if (category) {
-      result = result.filter((p) => p.category === category);
+      result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
     }
 
     return result;

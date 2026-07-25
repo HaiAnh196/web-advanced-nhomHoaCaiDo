@@ -1,23 +1,47 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../utils/api";
 import { useCart } from "../context/CartContext";
-import { ArrowLeft, ShoppingCart, ShieldCheck } from "lucide-react";
+import { useToast } from "../context/ToastContext";
+import ProductCard from "../components/ProductCard";
+import { 
+  ArrowLeft, 
+  ShoppingCart, 
+  ShieldCheck, 
+  Truck, 
+  Star, 
+  Zap, 
+  Check, 
+  ChevronRight, 
+  Gift 
+} from "lucide-react";
 
 function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("desc"); // 'desc', 'specs', 'warranty'
+
   const { addToCart } = useCart();
+  const { addToast } = useToast();
 
   useEffect(() => {
     setLoading(true);
+    setError("");
     api
       .get(`/products/${id}`)
       .then((response) => {
         setProduct(response.data);
+        // Tải các sản phẩm cùng category
+        api.get("/products", { params: { category: response.data.category } })
+          .then((res) => {
+            setRelatedProducts(res.data.filter((p) => p.id !== response.data.id));
+          })
+          .catch(() => {});
       })
       .catch((err) => {
         console.error("Lỗi khi tải chi tiết sản phẩm:", err);
@@ -31,126 +55,220 @@ function ProductDetail() {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, quantity);
-      alert(`Đã thêm ${quantity} sản phẩm "${product.name}" vào giỏ hàng!`);
+      addToast(`Đã thêm ${quantity} "${product.name}" vào giỏ hàng!`, "success");
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (product) {
+      addToCart(product, quantity);
+      navigate("/cart");
     }
   };
 
   if (loading) {
-    return <div style={{ padding: "40px", textAlign: "center" }}>Đang tải thông tin sản phẩm...</div>;
+    return (
+      <div className="detail-loading-box">
+        <div className="spinner"></div>
+        <p>Đang tải thông tin chi tiết sản phẩm...</p>
+      </div>
+    );
   }
 
   if (error || !product) {
     return (
-      <div style={{ padding: "40px", textAlign: "center", color: "#c62828" }}>
+      <div className="detail-error-box">
         <h3>{error || "Sản phẩm không tồn tại!"}</h3>
-        <Link to="/" style={{ color: "#e53935", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", marginTop: "15px" }}>
+        <Link to="/" className="btn-back-home">
           <ArrowLeft size={16} /> Quay lại trang chủ
         </Link>
       </div>
     );
   }
 
+  const oldPriceVal = product.oldPrice || Math.round(product.price * 1.12);
+
   return (
-    <div className="product-detail-container" style={{ maxWidth: "1000px", margin: "20px auto", padding: "0 20px" }}>
-      <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#555", textDecoration: "none", marginBottom: "20px" }}>
-        <ArrowLeft size={16} /> Quay lại danh sách sản phẩm
-      </Link>
+    <div className="product-detail-page">
+      {/* Breadcrumb Navigation */}
+      <nav className="breadcrumb-nav">
+        <Link to="/">Trang chủ</Link>
+        <ChevronRight size={14} />
+        <Link to={`/?category=${encodeURIComponent(product.category)}`}>{product.category}</Link>
+        <ChevronRight size={14} />
+        <span className="current">{product.name}</span>
+      </nav>
 
-      <div className="product-detail-layout" style={{
-        display: "flex",
-        gap: "40px",
-        background: "#fff",
-        borderRadius: "16px",
-        padding: "30px",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-        flexWrap: "wrap"
-      }}>
-        {/* Ảnh sản phẩm */}
-        <div className="product-detail-image" style={{ flex: "1 1 400px", maxWidth: "450px" }}>
-          <img 
-            src={product.imageUrl} 
-            alt={product.name} 
-            style={{ width: "100%", borderRadius: "12px", objectFit: "cover", aspectRatio: "1" }}
-          />
-        </div>
-
-        {/* Thông tin sản phẩm */}
-        <div className="product-detail-info" style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div>
-            <span className="category-tag" style={{
-              background: "#ffebee",
-              color: "#e53935",
-              padding: "4px 10px",
-              borderRadius: "20px",
-              fontSize: "12px",
-              fontWeight: "600",
-              textTransform: "uppercase",
-              display: "inline-block",
-              marginBottom: "15px"
-            }}>
-              {product.category}
-            </span>
-            <h1 style={{ fontSize: "28px", color: "#333", margin: "0 0 15px 0" }}>{product.name}</h1>
-            <p className="price" style={{ fontSize: "24px", color: "#e53935", fontWeight: "bold", margin: "0 0 20px 0" }}>
-              {product.price.toLocaleString()} VNĐ
-            </p>
-            <div style={{ height: "1px", background: "#eee", margin: "15px 0" }} />
-            <p style={{ color: "#666", lineHeight: "1.6", margin: "0 0 20px 0" }}>
-              {product.description}
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#666", fontSize: "14px", marginBottom: "20px" }}>
-              <ShieldCheck size={18} color="#2e7d32" />
-              <span>Còn lại: <strong>{product.stock}</strong> sản phẩm trong kho</span>
-            </div>
+      {/* Hero Layout Chi Tiết */}
+      <div className="product-detail-main-card">
+        {/* Cột Trái: Ảnh Sản Phẩm & Gallery */}
+        <div className="product-gallery-col">
+          <div className="main-image-wrapper">
+            <img src={product.imageUrl} alt={product.name} className="main-product-img" />
+            <span className="detail-top-badge">{product.badge || "Chính hãng Phenikaa"}</span>
           </div>
 
-          <div>
-            {/* Bộ chọn số lượng */}
-            <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px" }}>
-              <span style={{ fontWeight: "500", color: "#555" }}>Số lượng:</span>
-              <div style={{ display: "flex", alignItems: "center", border: "1px solid #ccc", borderRadius: "8px", overflow: "hidden" }}>
-                <button 
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  style={{ padding: "8px 15px", border: "none", background: "#f5f5f5", cursor: "pointer", fontSize: "16px" }}
-                >
-                  -
-                </button>
-                <span style={{ padding: "8px 20px", fontWeight: "600", minWidth: "20px", textAlign: "center" }}>{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
-                  style={{ padding: "8px 15px", border: "none", background: "#f5f5f5", cursor: "pointer", fontSize: "16px" }}
-                >
-                  +
-                </button>
+          <div className="thumbnail-row">
+            <div className="thumbnail-item active">
+              <img src={product.imageUrl} alt="Thumb 1" />
+            </div>
+            <div className="thumbnail-item">
+              <img src={product.imageUrl} alt="Thumb 2" />
+            </div>
+            <div className="thumbnail-item">
+              <img src={product.imageUrl} alt="Thumb 3" />
+            </div>
+          </div>
+        </div>
+
+        {/* Cột Phải: Thông tin & Mua Hàng */}
+        <div className="product-info-col">
+          <span className="category-pill">{product.category}</span>
+          <h1 className="detail-title">{product.name}</h1>
+
+          {/* Đánh giá & Số lượng đã bán */}
+          <div className="rating-sales-row">
+            <div className="rating-stars">
+              <Star size={16} className="star-icon-filled" />
+              <strong>{product.rating || 5.0}</strong>
+              <span className="review-count">({product.reviewCount || 46} đánh giá)</span>
+            </div>
+            <span className="divider">|</span>
+            <span className="stock-badge">
+              <ShieldCheck size={16} className="stock-icon" /> Còn lại {product.stock} sản phẩm
+            </span>
+          </div>
+
+          {/* Khung Giá Cực Đẹp */}
+          <div className="price-banner-box">
+            <div className="price-left">
+              <span className="detail-price-current">{product.price.toLocaleString()} ₫</span>
+              {oldPriceVal > product.price && (
+                <span className="detail-price-old">{oldPriceVal.toLocaleString()} ₫</span>
+              )}
+            </div>
+            <span className="price-tag-discount">Tiết kiệm 12%</span>
+          </div>
+
+          {/* Ưu Đãi Quà Tặng */}
+          <div className="detail-promo-card">
+            <div className="promo-header">
+              <Gift size={18} />
+              <strong>ƯU ĐÃI ĐẶC QUYỀN KHI MUA HÀNG</strong>
+            </div>
+            <ul className="promo-list">
+              <li><Check size={16} className="check-icon" /> Tặng gói bảo hành 24 tháng cao cấp Phenikaa Care</li>
+              <li><Check size={16} className="check-icon" /> Giảm thêm 1% cho thành viên sinh viên Edu</li>
+              <li><Check size={16} className="check-icon" /> Miễn phí giao hàng nội thành Hà Nội trong 2 giờ</li>
+            </ul>
+          </div>
+
+          {/* Bộ Chọn Số Lượng & Nút Hành Động */}
+          <div className="purchase-actions-box">
+            <div className="quantity-selector-row">
+              <span className="qty-label">Số lượng:</span>
+              <div className="qty-control-box">
+                <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>-</button>
+                <span>{quantity}</span>
+                <button onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}>+</button>
               </div>
             </div>
 
-            {/* Nút thêm vào giỏ */}
-            <button 
-              onClick={handleAddToCart}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                width: "100%",
-                padding: "15px",
-                background: "#e53935",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "background 0.2s"
-              }}
-            >
-              <ShoppingCart size={20} />
-              Thêm vào giỏ hàng
-            </button>
+            <div className="btn-group-actions">
+              <button className="btn-add-cart-outline" onClick={handleAddToCart}>
+                <ShoppingCart size={20} /> Thêm vào giỏ hàng
+              </button>
+              <button className="btn-buy-now-solid" onClick={handleBuyNow}>
+                <Zap size={20} /> Mua ngay lập tức
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Tab Chi Tiết & Thông Số */}
+      <div className="detail-tabs-container">
+        <div className="tab-headers">
+          <button 
+            className={`tab-btn ${activeTab === "desc" ? "active" : ""}`}
+            onClick={() => setActiveTab("desc")}
+          >
+            Mô tả sản phẩm
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === "specs" ? "active" : ""}`}
+            onClick={() => setActiveTab("specs")}
+          >
+            Thông số kỹ thuật
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === "warranty" ? "active" : ""}`}
+            onClick={() => setActiveTab("warranty")}
+          >
+            Chính sách bảo hành
+          </button>
+        </div>
+
+        <div className="tab-body-content">
+          {activeTab === "desc" && (
+            <div className="tab-pane">
+              <h3>Mô tả chi tiết sản phẩm</h3>
+              <p>{product.description}</p>
+              <p>
+                Sản phẩm được kiểm định chất lượng nghiêm ngặt, thiết kế chuẩn nhận diện Phenikaa Store, 
+                đảm bảo độ bền cao và độ hoàn thiện tinh xảo nhất.
+              </p>
+            </div>
+          )}
+
+          {activeTab === "specs" && (
+            <div className="tab-pane">
+              <h3>Thông số kỹ thuật</h3>
+              <table className="specs-table">
+                <tbody>
+                  <tr>
+                    <td>Thương hiệu:</td>
+                    <td>Phenikaa Uni Store / Apple Official</td>
+                  </tr>
+                  <tr>
+                    <td>Danh mục:</td>
+                    <td>{product.category}</td>
+                  </tr>
+                  <tr>
+                    <td>Tình trạng:</td>
+                    <td>Mới 100% Nguyên Seal</td>
+                  </tr>
+                  <tr>
+                    <td>Xuất xứ:</td>
+                    <td>Chính hãng phân phối độc quyền</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === "warranty" && (
+            <div className="tab-pane">
+              <h3>Chính sách đổi trả & Bảo hành</h3>
+              <p>✔ Bảo hành 24 tháng chính hãng tại các trung tâm ủy quyền.</p>
+              <p>✔ Đổi mới 1-1 trong 30 ngày nếu phát sinh lỗi từ nhà sản xuất.</p>
+              <p>✔ Hỗ trợ kĩ thuật tận tâm trọn đời.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sản Phẩm Liên Quan */}
+      {relatedProducts.length > 0 && (
+        <div className="related-products-section">
+          <h2>Sản phẩm cùng danh mục</h2>
+          <div className="product-grid">
+            {relatedProducts.slice(0, 4).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
