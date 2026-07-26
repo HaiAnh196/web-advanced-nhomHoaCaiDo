@@ -1,66 +1,94 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import "./App.css";
 
-function App() {
-  const [products, setProducts] = useState([]);
+// Import components dùng chung
+import Navbar from "./components/Navbar";
+import MessengerChat from "./components/MessengerChat";
 
-  // Tự động gọi API lấy danh sách sản phẩm khi vừa mở trang
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/products")
-      .then((response) => {
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        console.error("Lỗi khi tải sản phẩm:", error);
-      });
-  }, []);
+// Import các trang
+import ProductList from "./pages/ProductList";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Admin from "./pages/Admin";
 
+// Import Context Providers
+import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
+
+// Component Layout dành riêng cho Người Dùng / Khách Hàng (có Navbar, Chat, Footer)
+function UserLayout() {
   return (
     <div className="app-container">
-      {/* Header chuẩn màu Phenikaa */}
-      <header className="header">
-        <div className="logo">🏫 Phenikaa E-Commerce</div>
-        <nav>
-          <button className="btn-login">Đăng nhập</button>
-        </nav>
-      </header>
+      {/* Thanh điều hướng chính */}
+      <Navbar />
 
-      {/* Nội dung chính */}
+      {/* Nội dung chính các trang người dùng */}
       <main className="main-content">
-        <div className="banner">
-          <h1>Chào mừng đến với Cửa hàng Sinh viên Phenikaa</h1>
-          <p>Nơi cung cấp đồng phục, phụ kiện và giáo trình chính hãng</p>
-        </div>
-
-        <h2 className="section-title">Sản phẩm nổi bật</h2>
-
-        {/* Lưới hiển thị sản phẩm */}
-        <div className="product-grid">
-          {products.length === 0 ? (
-            <p>Đang tải dữ liệu từ Backend...</p>
-          ) : (
-            products.map((product) => (
-              <div key={product.id} className="product-card">
-                <img src={product.imageUrl} alt={product.name} />
-                <div className="product-info">
-                  <span className="category-tag">{product.category}</span>
-                  <h3>{product.name}</h3>
-                  <p className="price">{product.price.toLocaleString()} VNĐ</p>
-                  <button className="btn-buy">Thêm vào giỏ</button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <Outlet />
       </main>
 
-      {/* Footer */}
+      {/* Bộ Nút Liên Hệ & Khung Chat Messenger Tương Tác */}
+      <MessengerChat />
+
+      {/* Footer Hiện Đại */}
       <footer className="footer">
-        <p>© 2026 Phenikaa University - Dự án Web Nâng cao (Nhóm Hoa Cải Đỏ)</p>
+        <div className="footer-container">
+          <div className="footer-col">
+            <h3>HoaCaiDo Phenikaa Store</h3>
+            <p>Hệ thống cung cấp thiết bị công nghệ & quà tặng thương hiệu Đại học Phenikaa chất lượng cao.</p>
+            <p className="copyright-text">© 2026 Phenikaa University - Dự án Web Nâng cao (Nhóm Hoa Cải Đỏ)</p>
+          </div>
+          <div className="footer-col">
+            <h4>Về Chúng Tôi</h4>
+            <ul>
+              <li><a href="/">Giới thiệu thương hiệu</a></li>
+              <li><a href="/">Tuyển dụng & Sự kiện</a></li>
+              <li><a href="/">Chính sách bảo mật</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h4>Hỗ Trợ Khách Hàng</h4>
+            <ul>
+              <li><a href="/">Hướng dẫn mua hàng online</a></li>
+              <li><a href="/">Chính sách bảo hành 24/7</a></li>
+              <li><a href="/">Tra cứu đơn hàng</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h4>Liên Hệ</h4>
+            <p>📍 Địa chỉ: Yên Nghĩa, Hà Đông, Hà Nội</p>
+            <p>📞 Hotline: 1900 1008</p>
+            <p>✉️ Email: web.hoacaido@phenikaa-uni.edu.vn</p>
+          </div>
+        </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ToastProvider>
+      <CartProvider>
+        <Router>
+          <Routes>
+            {/* GIAO DIỆN NGƯỜI DÙNG / KHÁCH HÀNG */}
+            <Route element={<UserLayout />}>
+              <Route path="/" element={<ProductList />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+
+            {/* GIAO DIỆN QUẢN TRỊ ADMIN (Độc lập hoàn toàn, không bọc UserLayout) */}
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+        </Router>
+      </CartProvider>
+    </ToastProvider>
   );
 }
 
