@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, ShoppingCart, User, LogOut, PhoneCall, ShieldCheck, MapPin, Store, UserCheck, Edit3 } from "lucide-react";
+import { Search, ShoppingCart, User, LogOut, PhoneCall, ShieldCheck, MapPin, Store, Edit3, LayoutDashboard } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
@@ -10,18 +10,17 @@ function Navbar() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const { totalItemsCount } = useCart();
   const { addToast } = useToast();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("token"));
+  const [username, setUsername] = useState(() => localStorage.getItem("username") || "Khách hàng");
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const token = localStorage.getItem("token");
+    const storedUsername = localStorage.getItem("username") || "Khách hàng";
+    const storedRole = localStorage.getItem("role");
+    return !!token && (storedRole === "ADMIN" || storedUsername.toLowerCase() === "admin");
+  });
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUsername = localStorage.getItem("username") || "Khách hàng";
-    setIsLoggedIn(!!token);
-    setUsername(storedUsername);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -45,7 +44,9 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("role");
     setIsLoggedIn(false);
+    setIsAdmin(false);
     setShowUserDropdown(false);
     addToast("Đã đăng xuất thành công!", "info");
     navigate("/login");
@@ -88,6 +89,17 @@ function Navbar() {
 
             {/* Nhóm Nút Tiện Ích Bên Phải Header */}
             <div className="header-quick-links">
+              {/* Trang Quản Lý Admin (Chỉ dành cho tài khoản Admin) */}
+              {isAdmin && (
+                <Link to="/admin" className="header-nav-item admin-link-pill">
+                  <LayoutDashboard size={18} className="item-icon" />
+                  <div className="item-text">
+                    <span>Trang web</span>
+                    <strong>Quản lý</strong>
+                  </div>
+                </Link>
+              )}
+
               {/* Pill Chọn Tỉnh Thành */}
               <div className="header-location-pill">
                 <span>Xem giá tại ▾</span>
@@ -149,6 +161,11 @@ function Navbar() {
                         <span></span>
                       </div>
                       <hr />
+                      {isAdmin && (
+                        <button onClick={() => { setShowUserDropdown(false); navigate("/admin"); }} className="dropdown-item">
+                          <LayoutDashboard size={16} /> Trang quản lý (Admin)
+                        </button>
+                      )}
                       <button onClick={handleOpenProfile} className="dropdown-item">
                         <Edit3 size={16} /> Chỉnh sửa thông tin cá nhân
                       </button>

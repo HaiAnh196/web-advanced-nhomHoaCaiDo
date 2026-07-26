@@ -8,7 +8,6 @@ import {
   ArrowLeft, 
   ShoppingCart, 
   ShieldCheck, 
-  Truck, 
   Star, 
   Zap, 
   Check, 
@@ -30,8 +29,6 @@ function ProductDetail() {
   const { addToast } = useToast();
 
   useEffect(() => {
-    setLoading(true);
-    setError("");
     api
       .get(`/products/${id}`)
       .then((response) => {

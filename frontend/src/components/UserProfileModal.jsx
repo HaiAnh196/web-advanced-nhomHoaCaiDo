@@ -1,22 +1,24 @@
-import { useState, useEffect } from "react";
-import { X, User, Phone, Mail, MapPin, Save, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { X, User, Phone, Mail, MapPin, Save } from "lucide-react";
 import { useToast } from "../context/ToastContext";
 
 function UserProfileModal({ isOpen, onClose, onUpdateUsername }) {
   const { addToast } = useToast();
-  const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  const [username, setUsername] = useState(() => localStorage.getItem("username") || "Khách hàng");
+  const [phone, setPhone] = useState(() => localStorage.getItem("user_phone") || "0987654321");
+  const [email, setEmail] = useState(() => localStorage.getItem("user_email") || "khachhang@phenikaa.edu.vn");
+  const [address, setAddress] = useState(() => localStorage.getItem("user_address") || "Đại học Phenikaa, Yên Nghĩa, Hà Đông, Hà Nội");
 
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setUsername(localStorage.getItem("username") || "Khách hàng");
       setPhone(localStorage.getItem("user_phone") || "0987654321");
       setEmail(localStorage.getItem("user_email") || "khachhang@phenikaa.edu.vn");
       setAddress(localStorage.getItem("user_address") || "Đại học Phenikaa, Yên Nghĩa, Hà Đông, Hà Nội");
     }
-  }, [isOpen]);
+  }
 
   if (!isOpen) return null;
 

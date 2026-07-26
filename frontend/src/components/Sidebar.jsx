@@ -9,7 +9,6 @@ import {
   RotateCcw,
   BatteryCharging,
   ChevronRight,
-  Sparkles,
   Zap,
   ArrowRight,
   Flame,

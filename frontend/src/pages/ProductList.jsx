@@ -20,7 +20,6 @@ function ProductList() {
   const [sortBy, setSortBy] = useState("default");
 
   useEffect(() => {
-    setLoading(true);
     const params = {};
     if (searchQuery) params.search = searchQuery;
     if (categoryQuery) params.category = categoryQuery;
@@ -102,7 +101,7 @@ function ProductList() {
               <div className="widget-header-title">Khuyến mãi nổi bật</div>
               <div className="widget-banner-img-box">
                 <img 
-                  src="https://clickbuy.com.vn/uploads/pro/104234/214840-sac-nhanh-iphone-20w-original-1.jpg" 
+                  src="https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&auto=format&fit=crop&q=80" 
                   alt="Khuyến mãi nổi bật" 
                   className="widget-img" 
                 />
@@ -113,7 +112,7 @@ function ProductList() {
             <div className="promo-widget-card secondary">
               <div className="widget-banner-img-box">
                 <img 
-                  src="https://clickbuy.com.vn/uploads/pro/iphone-17-pro-max-7908-hqzm-1024x1024-218698.jpg" 
+                  src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80" 
                   alt="iPhone 17 Series" 
                   className="widget-img" 
                 />

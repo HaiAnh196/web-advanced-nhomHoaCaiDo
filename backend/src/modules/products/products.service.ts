@@ -26,7 +26,8 @@ export class ProductsService {
     {
       id: '1',
       name: 'iPhone 17 Pro Max 256GB Chính Hãng',
-      description: 'Super Retina XDR, Chip A19 Pro siêu mạnh mẽ, Camera cao cấp.',
+      description:
+        'Super Retina XDR, Chip A19 Pro siêu mạnh mẽ, Camera cao cấp.',
       price: 34790000,
       oldPrice: 37490000,
       badge: 'Trả góp 0% trả trước 0đ',
@@ -38,14 +39,16 @@ export class ProductsService {
       promotionText: 'Tặng gói bảo hành 2 năm trị giá 2.000.000đ',
       extraPromotions: 3,
       stock: 15,
-      imageUrl: 'https://clickbuy.com.vn/uploads/pro/iphone-17-pro-max-7908-hqzm-1024x1024-218698.jpg',
+      imageUrl:
+        'https://clickbuy.com.vn/uploads/pro/iphone-17-pro-max-7908-hqzm-1024x1024-218698.jpg',
       category: 'iPhone',
       createdAt: new Date(),
     },
     {
       id: '2',
       name: 'Sạc nhanh iphone',
-      description: 'Áo thun đồng phục chất liệu cotton thoáng mát, logo thêu sắc nét.',
+      description:
+        'Áo thun đồng phục chất liệu cotton thoáng mát, logo thêu sắc nét.',
       price: 150000,
       oldPrice: 180000,
       badge: 'Bán chạy nhất',
@@ -57,7 +60,8 @@ export class ProductsService {
       promotionText: 'Tặng kèm 01 túi bóng',
       extraPromotions: 2,
       stock: 50,
-      imageUrl: 'https://clickbuy.com.vn/uploads/pro/104234/214840-sac-nhanh-iphone-20w-original-1.jpg',
+      imageUrl:
+        'https://clickbuy.com.vn/uploads/pro/104234/214840-sac-nhanh-iphone-20w-original-1.jpg',
       category: 'Phụ kiện',
       createdAt: new Date(),
     },
@@ -76,7 +80,8 @@ export class ProductsService {
       promotionText: 'Tặng túi chống sốc đựng bình nước',
       extraPromotions: 1,
       stock: 30,
-      imageUrl: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&auto=format&fit=crop&q=80',
+      imageUrl:
+        'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&auto=format&fit=crop&q=80',
       category: 'Phụ kiện',
       createdAt: new Date(),
     },
@@ -95,7 +100,8 @@ export class ProductsService {
       promotionText: 'Tặng bao che mưa balo thời trang',
       extraPromotions: 2,
       stock: 20,
-      imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80',
+      imageUrl:
+        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80',
       category: 'Phụ kiện',
       createdAt: new Date(),
     },
@@ -106,23 +112,26 @@ export class ProductsService {
 
     if (search) {
       const term = search.toLowerCase();
-      result = result.filter((p) =>
-        p.name.toLowerCase().includes(term) ||
-        p.category.toLowerCase().includes(term) ||
-        (p.description && p.description.toLowerCase().includes(term)) ||
-        (p.subBanner && p.subBanner.toLowerCase().includes(term))
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(term) ||
+          p.category.toLowerCase().includes(term) ||
+          (p.description && p.description.toLowerCase().includes(term)) ||
+          (p.subBanner && p.subBanner.toLowerCase().includes(term)),
       );
     }
 
     if (category) {
-      result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+      result = result.filter(
+        (p) => p.category.toLowerCase() === category.toLowerCase(),
+      );
     }
 
     return result;
   }
 
   findOne(id: string): Product {
-    const product = this.products.find((p) => p.id === id);
+    const product = this.products.find((p) => String(p.id) === String(id));
     if (!product) {
       throw new NotFoundException(`Không tìm thấy sản phẩm có ID: ${id}`);
     }
@@ -140,7 +149,7 @@ export class ProductsService {
   }
 
   update(id: string, dto: Partial<Omit<Product, 'id' | 'createdAt'>>): Product {
-    const index = this.products.findIndex((p) => p.id === id);
+    const index = this.products.findIndex((p) => String(p.id) === String(id));
     if (index === -1) {
       throw new NotFoundException(`Không tìm thấy sản phẩm có ID: ${id}`);
     }
@@ -153,7 +162,7 @@ export class ProductsService {
   }
 
   remove(id: string): { message: string } {
-    const index = this.products.findIndex((p) => p.id === id);
+    const index = this.products.findIndex((p) => String(p.id) === String(id));
     if (index === -1) {
       throw new NotFoundException(`Không tìm thấy sản phẩm có ID: ${id}`);
     }

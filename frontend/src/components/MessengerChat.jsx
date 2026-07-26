@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User, Phone, ShieldCheck, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Bot, Phone, Sparkles } from "lucide-react";
 
 function MessengerChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,7 @@ function MessengerChat() {
     if (!text.trim()) return;
 
     const userMsg = {
-      id: Date.now(),
+      id: messages.length + 1,
       sender: "user",
       text: text.trim(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })

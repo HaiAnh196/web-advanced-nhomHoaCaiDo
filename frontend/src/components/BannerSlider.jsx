@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function BannerSlider() {
-  const slides = [
+  const defaultSlides = [
     {
       id: 1,
       tabTitle: "Galaxy S26 Series đã sẵn hàng",
@@ -10,7 +10,7 @@ function BannerSlider() {
       subtitle: "TÁI TẠO NĂNG LƯỢNG - GIÁ CHỈ TỪ 399K",
       badge: "THỜI GIAN: Từ ngày 24.06 đến 30.06.2026",
       bgGradient: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)",
-      image: "https://clickbuy.com.vn/uploads/pro/iphone-17-pro-max-7908-hqzm-1024x1024-218698.jpg",
+      image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80",
       link: "/product/1"
     },
     {
@@ -20,7 +20,7 @@ function BannerSlider() {
       subtitle: "Siêu Phẩm Đỉnh Cao 2026 - Tặng gói bảo hành 24 tháng",
       badge: "HOT LAUNCH 2026",
       bgGradient: "linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #ef4444 100%)",
-      image: "https://clickbuy.com.vn/uploads/pro/104234/214840-sac-nhanh-iphone-20w-original-1.jpg",
+      image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80",
       link: "/product/1"
     },
     {
@@ -45,19 +45,60 @@ function BannerSlider() {
     },
     {
       id: 5,
-      tabTitle: "Trả góp iPhone dễ dàng tại Clickbuy",
+      tabTitle: "Trả góp iPhone dễ dàng tại HoaCaiDo",
       title: "TRẢ GÓP 0% LÃI SUẤT",
       subtitle: "Trả trước 0đ - Duyệt hồ sơ siêu tốc trong 15 phút",
       badge: "ƯU ĐÃI ĐỘC QUYỀN",
       bgGradient: "linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%)",
-      image: "https://clickbuy.com.vn/uploads/pro/iphone-17-pro-max-7908-hqzm-1024x1024-218698.jpg",
+      image: "https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=800&auto=format&fit=crop&q=80",
       link: "/category/iphone"
     }
   ];
 
+  const [slides, setSlides] = useState(() => {
+    try {
+      const stored = localStorage.getItem("adminBanners");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const active = parsed.filter((item) => item.status !== "Inactive");
+          return active;
+        }
+      }
+    } catch {
+      /* empty */
+    }
+    return defaultSlides;
+  });
+
   const [currentSlide, setCurrentSlide] = useState(0);
+  const activeSlideIndex = slides.length > 0 ? currentSlide % slides.length : 0;
 
   useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem("adminBanners");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            const active = parsed.filter((item) => item.status !== "Inactive");
+            setSlides(active);
+          }
+        } else {
+          setSlides(defaultSlides);
+        }
+      } catch {
+        /* empty */
+      }
+    };
+
+    handleStorageChange();
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 4500);
@@ -65,14 +106,18 @@ function BannerSlider() {
   }, [slides.length]);
 
   const handlePrev = () => {
+    if (slides.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const handleNext = () => {
+    if (slides.length === 0) return;
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-  const activeSlide = slides[currentSlide];
+  if (!slides || slides.length === 0) return null;
+
+  const activeSlide = slides[activeSlideIndex] || slides[0];
 
   return (
     <div className="clickbuy-hero-slider-section">

@@ -22,11 +22,18 @@ function Login() {
     api
       .post("/auth/login", { username, password })
       .then((response) => {
-        localStorage.setItem("token", response.data.access_token);
+        const { access_token, role } = response.data;
+        const userRole = role || (username.toLowerCase() === "admin" ? "ADMIN" : "USER");
+        localStorage.setItem("token", access_token);
         localStorage.setItem("username", username);
+        localStorage.setItem("role", userRole);
+
         addToast(`Chào mừng ${username} đã quay trở lại!`, "success");
-        navigate("/");
-        window.location.reload();
+        if (userRole === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       })
       .catch((err) => {
         console.error("Lỗi đăng nhập:", err);

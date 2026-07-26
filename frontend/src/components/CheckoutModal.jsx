@@ -7,9 +7,9 @@ function CheckoutModal({ isOpen, onClose, discountAmount = 0 }) {
   const { cartItems, totalPrice, clearCart } = useCart();
   const { addToast } = useToast();
 
-  const [fullname, setFullname] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [fullname, setFullname] = useState(() => localStorage.getItem("username") || "");
+  const [phone, setPhone] = useState(() => localStorage.getItem("user_phone") || "");
+  const [address, setAddress] = useState(() => localStorage.getItem("user_address") || "");
   const [paymentMethod, setPaymentMethod] = useState("qr"); // 'qr', 'cod', 'card'
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderCode, setOrderCode] = useState("");
@@ -27,6 +27,80 @@ function CheckoutModal({ isOpen, onClose, discountAmount = 0 }) {
 
     const code = "HCD-" + Math.floor(100000 + Math.random() * 900000);
     setOrderCode(code);
+
+    const itemsSummary = (cartItems && cartItems.length > 0)
+      ? cartItems.map((item) => `${item.name} (x${item.quantity})`).join(", ")
+      : "Sản phẩm cửa hàng";
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+    const newOrder = {
+      id: code,
+      customer: fullname,
+      phone: phone,
+      address: address,
+      items: itemsSummary,
+      total: finalTotal,
+      paymentMethod: paymentMethod === "qr" ? "QR VietQR" : paymentMethod === "cod" ? "COD" : "Thẻ ATM",
+      status: "Processing",
+      createdAt: formattedDate,
+    };
+
+    try {
+      const savedOrdersStr = localStorage.getItem("adminOrders");
+      let currentOrders = savedOrdersStr ? JSON.parse(savedOrdersStr) : null;
+      if (!currentOrders || !Array.isArray(currentOrders)) {
+        currentOrders = [
+          {
+            id: "HCD-892301",
+            customer: "Nguyễn Văn An",
+            phone: "0988123456",
+            items: "iPhone 17 Pro Max 256GB (x1)",
+            total: 33990000,
+            paymentMethod: "QR VietQR",
+            status: "Processing",
+            createdAt: "2026-07-26 08:15",
+          },
+          {
+            id: "HCD-771204",
+            customer: "Trần Thị Mai",
+            phone: "0912345678",
+            items: "Bình Nước Giữ Nhiệt Phenikaa (x2)",
+            total: 798000,
+            paymentMethod: "COD",
+            status: "Shipping",
+            createdAt: "2026-07-25 14:30",
+          },
+          {
+            id: "HCD-654109",
+            customer: "Lê Hoàng Nam",
+            phone: "0934567890",
+            items: "Xiaomi Redmi Note 15 (x1), Balo Laptop (x1)",
+            total: 5589000,
+            paymentMethod: "Thẻ ATM",
+            status: "Completed",
+            createdAt: "2026-07-24 10:20",
+          },
+          {
+            id: "HCD-541290",
+            customer: "Phạm Thu Hà",
+            phone: "0977889900",
+            items: "Tai nghe Bluetooth Phenikaa Sound (x1)",
+            total: 1250000,
+            paymentMethod: "QR VietQR",
+            status: "Completed",
+            createdAt: "2026-07-23 16:45",
+          },
+        ];
+      }
+      const updatedOrders = [newOrder, ...currentOrders];
+      localStorage.setItem("adminOrders", JSON.stringify(updatedOrders));
+      window.dispatchEvent(new Event("storage"));
+    } catch (err) {
+      console.error("Lỗi khi lưu đơn hàng:", err);
+    }
+
     setIsSuccess(true);
     clearCart();
     addToast("Đặt hàng thành công! Mã đơn hàng: " + code, "success", 5000);
