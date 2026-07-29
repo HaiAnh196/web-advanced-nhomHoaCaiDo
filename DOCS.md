@@ -391,3 +391,77 @@ sequenceDiagram
         UI->>UI: Xóa dòng sản phẩm khỏi bảng trên giao diện
     end
 ```
+
+---
+
+## 3. BÁO CÁO KIỂM THỬ VÀ KIỂM ĐỊNH HỆ THỐNG (TESTING & VERIFICATION)
+
+Dự án sử dụng bộ khung kiểm thử **Jest & Supertest** trong NestJS để thực hiện kiểm định tự động từ mức đơn vị (Unit Test) cho tới toàn trình API (E2E Test), đảm bảo xử lý và bắt lỗi trong mọi trường hợp ngoại lệ.
+
+### 3.1. Chiến Lược Bắt Lỗi & Xử Lý Ngoại Lệ (Exception Handling)
+Hệ thống được thiết kế theo nguyên tắc *Defensive Programming* (Lập trình phòng thủ) và áp dụng các bộ xử lý lỗi của NestJS:
+1. **Lỗi không tìm thấy dữ liệu (`NotFoundException - HTTP 404`)**:
+   - Khi tìm kiếm, cập nhật hoặc xóa một sản phẩm không tồn tại trong hệ thống (ví dụ `GET /products/99999`), Service chủ động ném lỗi `NotFoundException("Không tìm thấy sản phẩm có ID: ...")`.
+2. **Lỗi xác thực & bảo mật (`UnauthorizedException - HTTP 401`)**:
+   - Khi người dùng đăng nhập sai mật khẩu hoặc tài khoản không tồn tại, `AuthService` chủ động từ chối và trả về HTTP 401 với thông báo rõ ràng *"Tên đăng nhập hoặc mật khẩu không chính xác!"*.
+3. **Lỗi trùng lặp dữ liệu (`ConflictException - HTTP 409` / `BadRequestException`)**:
+   - Kiểm tra trùng lặp `username` trước khi tạo mới trong CSDL SQLite.
+
+---
+
+### 3.2. Đơn Vị Kiểm Định (Unit Test)
+Các file Unit Test được đặt trực tiếp trong các module của thư mục `backend/src/` và chạy bằng lệnh `npm test`:
+
+* **`products.service.spec.ts` (10 ca kiểm định)**:
+  - Kiểm định `findAll()`: Trả về danh sách mặc định, lọc đúng theo từ khóa (`search`) và danh mục (`category`).
+  - Kiểm định `findOne()`: Trả về đúng sản phẩm khi ID tồn tại; **bắt lỗi ném ra `NotFoundException` khi ID không tồn tại**.
+  - Kiểm định `create()`: Tạo sản phẩm mới thành công và tăng số lượng tổng.
+  - Kiểm định `update()` & `remove()`: Cập nhật và xóa thành công; **bắt lỗi `NotFoundException` khi thao tác trên ID không hợp lệ**.
+* **`auth.service.spec.ts` (7 ca kiểm định)**:
+  - Kiểm định `login()`: Đăng nhập thành công với tài khoản Admin (`role: ADMIN`) và User (`role: USER`), kiểm tra gọi `jwtService.signAsync`.
+  - **Kiểm định bắt lỗi bảo mật**: Ném ra `UnauthorizedException` khi sai mật khẩu hoặc tài khoản không tồn tại.
+  - Kiểm định `register()`: Đăng ký tài khoản mới và gọi đúng hàm lưu vào CSDL.
+
+**Kết quả chạy Unit Test (`npm test`):**
+```text
+PASS src/app.controller.spec.ts
+PASS src/modules/products/products.controller.spec.ts
+PASS src/modules/products/products.service.spec.ts
+PASS src/modules/users/users.controller.spec.ts
+PASS src/modules/users/users.service.spec.ts
+PASS src/modules/auth/auth.controller.spec.ts
+PASS src/modules/auth/auth.service.spec.ts
+
+Test Suites: 7 passed, 7 total
+Tests:       22 passed, 22 total
+Time:        2.678 s
+```
+
+---
+
+### 3.3. Kiểm Thử Toàn Trình Ứng Dụng (E2E Test)
+Các ca kiểm thử E2E được đặt trong thư mục `backend/test/app.e2e-spec.ts` (khung làm việc chuẩn của NestJS) và chạy bằng lệnh `npm run test:e2e`:
+* Kiểm thử endpoint gốc `/ (GET)`.
+* Kiểm thử lấy danh sách sản phẩm `/products (GET)` trả về HTTP 200 OK.
+* **Kiểm thử bắt lỗi API sản phẩm `/products/:id (GET)`** với ID không hợp lệ -> Trả về HTTP 404 Not Found.
+* **Kiểm thử bắt lỗi API đăng nhập `/auth/login (POST)`** với mật khẩu sai -> Trả về HTTP 401 Unauthorized.
+* Kiểm thử đăng nhập hợp lệ -> Trả về HTTP 201 Created kèm `access_token` và `role: ADMIN`.
+
+**Kết quả chạy E2E Test (`npm run test:e2e`):**
+```text
+PASS test/app.e2e-spec.ts
+  Kiểm thử E2E & Bắt lỗi hệ thống (e2e)
+    Kiểm thử gốc (Root /)
+      √ / (GET) - trả về Hello World! (246 ms)
+    Kiểm thử & Bắt lỗi API Sản phẩm (/products)
+      √ /products (GET) - trả về danh sách sản phẩm (200 OK) (20 ms)
+      √ /products/:id (GET) - [Bắt lỗi] trả về 404 Not Found khi tìm ID không tồn tại (14 ms)
+    Kiểm thử & Bắt lỗi API Xác thực (/auth)
+      √ /auth/login (POST) - [Bắt lỗi] trả về 401 Unauthorized khi sai mật khẩu (25 ms)
+      √ /auth/login (POST) - đăng nhập thành công với admin (200 OK) (19 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Time:        1.929 s
+```
+
