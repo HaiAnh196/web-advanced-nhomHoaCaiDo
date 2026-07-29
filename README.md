@@ -4,17 +4,47 @@ Dự án Bài tập lớn cuối kỳ môn Lập trình Web Nâng cao (Lớp N01
 
 ## 👥 Thành viên nhóm & Đóng góp
 
-| STT | Mã SV    | Họ và tên        | Phân công nhiệm vụ                       | Đóng góp (%) |
-| :-- | :------- | :--------------- | :--------------------------------------- | :----------- |
-| 1   | 24100110 | Lê Hải Anh       | Lead Backend & Database (API, CSDL)      | 33.3%        |
-| 2   | 24100233 | Vũ Đức Toàn      | Lead Frontend & UI (Giao diện, Ghép API) | 33.3%        |
-| 3   | 24100188 | Nguyễn Đình Tùng | BA, Vẽ UML, Unit Test, Báo cáo & Video   | 33.4%        |
+|  STT  |   Mã SV    | Họ và tên               | Vai trò / Phân công Nhiệm vụ Chính                                                                                                                                                | Đóng góp (%) |
+| :---: | :--------: | :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------: |
+| **1** | `24100110` | **Lê Hải Anh** _(Lead)_ | **Lead Backend & Database:** Xây dựng kiến trúc API NestJS, cấu hình CSDL SQLite với TypeORM (`better-sqlite3`), triển khai Auth (JWT), UsersModule, kiểm thử API & viết Báo cáo. |   **40%**    |
+| **2** | `24100233` | **Nguyễn Đình Tùng**    | **Lead Frontend & UI:** Thiết kế giao diện UI/UX React/Vite cho HoaCaiDo Store, ghép API giỏ hàng, quản lý trạng thái (State) ứng dụng & hỗ trợ Báo cáo.                          |   **40%**    |
+| **3** | `24100188` | **Vũ Đức Toàn**         | **Business Analyst (BA):** Phân tích yêu cầu nghiệp vụ, vẽ sơ đồ UML/ERD, quay & dựng Video Demo hệ thống (thời lượng dưới 8 phút) và hỗ trợ Báo cáo.                             |   **20%**    |
 
 ## 🔗 Liên kết quan trọng
 
-- **📚 Tài liệu Kiến trúc, Sơ đồ cấu trúc lớp (UML) & Sơ đồ thuật toán:** [Xem chi tiết tại DOCS.md](./DOCS.md)
-- **Link Video Demo (Dưới 8 phút):** [Chưa cập nhật]
-- **Link Github:** https://github.com/HaiAnh196/web-advanced-nhomHoaCaiDo
+- **Link Video Demo (Dưới 8 phút):** [https://drive.google.com/file/d/13nqSXu54VBIhF6RPURgyQ-5c0US67aYr/view?usp=sharing](https://drive.google.com/file/d/13nqSXu54VBIhF6RPURgyQ-5c0US67aYr/view?usp=sharing)
+- **Link Github:** [https://github.com/HaiAnh196/web-advanced-nhomHoaCaiDo](https://github.com/HaiAnh196/web-advanced-nhomHoaCaiDo)
+
+---
+
+## 🚀 Hướng dẫn Chạy Dự án
+
+### 1. Khởi chạy Backend (NestJS)
+
+```bash
+# Cài đặt thư viện phụ thuộc
+npm install
+
+# Khởi chạy ứng dụng ở chế độ Development
+npm run start:dev
+
+# Backend sẽ chạy tại: http://localhost:3000/api
+```
+
+### 2. Khởi chạy Frontend (React / Vite)
+
+```bash
+# Di chuyển vào thư mục frontend
+cd frontend
+
+# Cài đặt thư viện phụ thuộc
+npm install
+
+# Khởi chạy dự án React
+npm run dev
+
+# Frontend sẽ chạy tại: http://localhost:5173
+```
 
 ---
 
@@ -46,3 +76,7 @@ Khi xây dựng một hệ thống E-commerce, dự án cần tuân thủ các q
   - Hệ thống sử dụng Cơ chế xác thực JWT (JSON Web Token) để cấp quyền truy cập.
   - Phân quyền chặt chẽ (Authorization): Khách hàng (Customer) không thể gọi API quản lý (Thêm/Sửa/Xóa sản phẩm) của Quản trị viên (Admin).
   - Sử dụng công cụ ORM (Object-Relational Mapping) như TypeORM/Prisma để chủ động phòng chống tấn công SQL Injection, đảm bảo CSDL không bị phá hoại.
+
+```
+
+```
