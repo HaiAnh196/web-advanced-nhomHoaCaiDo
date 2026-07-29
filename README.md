@@ -12,6 +12,7 @@ Dự án Bài tập lớn cuối kỳ môn Lập trình Web Nâng cao (Lớp N01
 
 ## 🔗 Liên kết quan trọng
 
+- **📚 Tài liệu Kiến trúc, Sơ đồ cấu trúc lớp (UML) & Sơ đồ thuật toán:** [Xem chi tiết tại DOCS.md](./DOCS.md)
 - **Link Video Demo (Dưới 8 phút):** [Chưa cập nhật]
 - **Link Github:** https://github.com/HaiAnh196/web-advanced-nhomHoaCaiDo
 
